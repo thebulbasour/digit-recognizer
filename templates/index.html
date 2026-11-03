@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Digit Recognizer</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <h1>Handwritten Digit Recognizer</h1>
+
+    <p>Draw a digit from 0 to 9 below.</p>
+
+    <canvas id="drawingCanvas" width="280" height="280"></canvas>
+
+    <br><br>
+
+    <button id="clearButton">Clear</button>
+    <button id="predictButton">Predict</button>
+
+    <h2 id="result">Prediction:</h2>
+
+    <script>
+
+        const canvas = document.getElementById("drawingCanvas");
+        const ctx = canvas.getContext("2d");
+
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 20;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        let isDrawing = false;
+
+        canvas.addEventListener("mousedown", function(event) {
+
+            isDrawing = true;
+
+            ctx.beginPath();
+
+            const rect = canvas.getBoundingClientRect();
+
+            ctx.moveTo(
+                event.clientX - rect.left,
+                event.clientY - rect.top
+            );
+        });
+
+        canvas.addEventListener("mousemove", function(event) {
+
+            if (!isDrawing) return;
+
+            const rect = canvas.getBoundingClientRect();
+
+            ctx.lineTo(
+                event.clientX - rect.left,
+                event.clientY - rect.top
+            );
+
+            ctx.stroke();
+        });
+
+        canvas.addEventListener("mouseup", function() {
+            isDrawing = false;
+        });
+
+        canvas.addEventListener("mouseleave", function() {
+            isDrawing = false;
+        });
+
+        document.getElementById("clearButton").addEventListener("click", function() {
+
+            ctx.clearRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+            document.getElementById("result").innerText = "Prediction:";
+        });
+
+        document.getElementById("predictButton").addEventListener("click", async function() {
+
+            const resultElement = document.getElementById("result");
+
+            resultElement.innerText = "Predicting...";
+
+            try {
+
+                const imageBlob = await new Promise(resolve => {
+                    canvas.toBlob(resolve, "image/png");
+                });
+
+                const formData = new FormData();
+
+                formData.append("image", imageBlob, "drawing.png");
+
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error("Server error: " + response.status);
+                }
+
+                const result = await response.json();
+
+                resultElement.innerText =
+                    "Predicted Digit: " + result.digit +
+                    " | Confidence: " + result.confidence + "%";
+
+            }
+
+            catch (error) {
+
+                resultElement.innerText =
+                    "Prediction failed: " + error.message;
+
+                console.error(error);
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>

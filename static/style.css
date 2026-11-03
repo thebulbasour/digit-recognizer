@@ -1,0 +1,55 @@
+body {
+    background-color: grey;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 40px;
+}
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #333333;
+    font-size: 18px;
+}
+
+canvas {
+    display: block;
+    margin: 20px auto;
+    background-color: black;
+    border: 2px solid #374151;
+    border-radius: 12px;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+button {
+    padding: 12px 24px;
+    margin: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#clearButton {
+    background-color: #374151;
+    color: white;
+}
+
+#predictButton {
+    background-color: #2563eb;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+#result {
+    margin-top: 25px;
+    color: #111827;
+}
